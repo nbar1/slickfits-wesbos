@@ -48,8 +48,6 @@ const CreateItem = () => {
 
 		const file = await response.json();
 
-		console.log(file);
-
 		setImage(file.secure_url);
 		setLargeImage(file.eager[0].secure_url);
 	};
