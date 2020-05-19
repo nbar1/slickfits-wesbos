@@ -1,10 +1,9 @@
 import React from 'react';
-import styled from 'styled-components';
 import PaginationStyles from './styles/PaginationStyles';
 import gql from 'graphql-tag';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Query } from 'react-apollo';
+import { useQuery } from '@apollo/react-hooks';
 import { perPage } from '../config';
 
 const PAGINATION_QUERY = gql`
@@ -17,52 +16,49 @@ const PAGINATION_QUERY = gql`
 	}
 `;
 
-const Pagination = ({ page }) => (
-	<Query query={PAGINATION_QUERY}>
-		{({ data, loading, error }) => {
-			if (loading) return <p>Loading...</p>;
+const Pagination = ({ page }) => {
+	const { loading, error, data } = useQuery(PAGINATION_QUERY);
 
-			const count = data.itemsConnection.aggregate.count;
-			const pages = Math.ceil(count / perPage);
+	if (loading) return <p>Loading...</p>;
+	if (error) return <p>Error: {error.message}</p>;
 
-			return (
-				<PaginationStyles>
-					<Head>
-						<title>
-							Sick Fits | Page {page} of {pages}
-						</title>
-					</Head>
-					<Link
-						prefetch
-						href={{
-							pathname: 'items',
-							query: { page: page - 1 },
-						}}
-					>
-						<a className="prev" aria-disabled={page <= 1}>
-							Prev
-						</a>
-					</Link>
-					<p>
-						Page {page} of {pages}
-					</p>
-					<p>{count} Items Total</p>
+	const count = data.itemsConnection.aggregate.count;
+	const pages = Math.ceil(count / perPage);
 
-					<Link
-						prefetch
-						href={{
-							pathname: 'items',
-							query: { page: page + 1 },
-						}}
-					>
-						<a className="next" aria-disabled={page >= pages}>
-							Next
-						</a>
-					</Link>
-				</PaginationStyles>
-			);
-		}}
-	</Query>
-);
+	return (
+		<PaginationStyles>
+			<Head>
+				<title>
+					Sick Fits | Page {page} of {pages}
+				</title>
+			</Head>
+			<Link
+				href={{
+					pathname: 'items',
+					query: { page: page - 1 },
+				}}
+			>
+				<a className="prev" aria-disabled={page <= 1}>
+					Prev
+				</a>
+			</Link>
+			<p>
+				Page {page} of {pages}
+			</p>
+			<p>{count} Items Total</p>
+
+			<Link
+				href={{
+					pathname: 'items',
+					query: { page: page + 1 },
+				}}
+			>
+				<a className="next" aria-disabled={page >= pages}>
+					Next
+				</a>
+			</Link>
+		</PaginationStyles>
+	);
+};
 
 export default Pagination;

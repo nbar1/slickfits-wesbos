@@ -1,5 +1,5 @@
 import React from 'react';
-import { Query } from 'react-apollo';
+import { useQuery } from '@apollo/react-hooks';
 import styled from 'styled-components';
 import gql from 'graphql-tag';
 
@@ -33,23 +33,24 @@ const ItemsList = styled.div`
 `;
 
 const Items = ({ page }) => {
+	const { loading, error, data } = useQuery(ALL_ITEMS_QUERY, {
+		variables: { skip: page * perPage - perPage },
+		fetchPolicy: 'network-only',
+	});
+
 	return (
 		<Center>
 			<Pagination page={page} />
-			<Query query={ALL_ITEMS_QUERY} fetchPolicy="network-only" variables={{ skip: page * perPage - perPage }}>
-				{({ data, error, loading }) => {
-					if (loading) return <p>Loading...</p>;
-					if (error) return <p>Error: {error.message}</p>;
+			{loading && <p>Loading...</p>}
+			{error && <p>Error: {error.message}</p>}
 
-					return (
-						<ItemsList>
-							{data.items.map(item => (
-								<Item item={item} key={item.id} />
-							))}
-						</ItemsList>
-					);
-				}}
-			</Query>
+			{!loading && !error && (
+				<ItemsList>
+					{data.items.map(item => (
+						<Item item={item} key={item.id} />
+					))}
+				</ItemsList>
+			)}
 			<Pagination page={page} />
 		</Center>
 	);
