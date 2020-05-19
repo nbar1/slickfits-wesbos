@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import gql from 'graphql-tag';
-import { Query } from 'react-apollo';
+import { useQuery } from '@apollo/react-hooks';
 import Error from './ErrorMessage';
 import Head from 'next/head';
 
@@ -38,34 +38,27 @@ const SingleItemStyles = styled.div`
 `;
 
 const SingleItem = ({ id }) => {
+	const { loading, error, data } = useQuery(SINGLE_ITEM_QUERY, {
+		variables: { id: id },
+	});
+
+	if (error) return <Error error={error} />;
+	if (loading) return <p>Loading!</p>;
+	if (!data.item) return <p>No Item Found For {id}</p>;
+
+	const item = data.item;
+
 	return (
-		<Query
-			query={SINGLE_ITEM_QUERY}
-			variables={{
-				id: id,
-			}}
-		>
-			{({ error, loading, data }) => {
-				if (error) return <Error error={error} />;
-				if (loading) return <p>Loading!</p>;
-				if (!data.item) return <p>No Item Found For {id}</p>;
-
-				const item = data.item;
-
-				return (
-					<SingleItemStyles>
-						<Head>
-							<title>Sick Fits | {item.title}</title>
-						</Head>
-						<img src={item.largeImage} alt={item.title} />
-						<div className="details">
-							<h2>Viewing {item.title}</h2>
-							<p>{item.description}</p>
-						</div>
-					</SingleItemStyles>
-				);
-			}}
-		</Query>
+		<SingleItemStyles>
+			<Head>
+				<title>Sick Fits | {item.title}</title>
+			</Head>
+			<img src={item.largeImage} alt={item.title} />
+			<div className="details">
+				<h2>Viewing {item.title}</h2>
+				<p>{item.description}</p>
+			</div>
+		</SingleItemStyles>
 	);
 };
 
