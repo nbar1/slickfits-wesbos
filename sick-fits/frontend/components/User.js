@@ -16,6 +16,9 @@ const CURRENT_USER_QUERY = gql`
 const User = ({ children }) => {
 	const payload = useQuery(CURRENT_USER_QUERY);
 
+	// TODO issue with this, chapter 26/27
+	if (!payload.data) return null;
+
 	return children(payload);
 };
 

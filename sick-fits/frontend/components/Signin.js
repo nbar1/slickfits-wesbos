@@ -6,9 +6,9 @@ import Error from './ErrorMessage';
 import { useMutation } from '@apollo/react-hooks';
 import { CURRENT_USER_QUERY } from './User';
 
-const SIGNUP_MUTATION = gql`
-	mutation SIGNUP_MUTATION($email: String!, $name: String!, $password: String!) {
-		signup(email: $email, name: $name, password: $password) {
+const SIGNIN_MUTATION = gql`
+	mutation SIGNIN_MUTATION($email: String!, $password: String!) {
+		signin(email: $email, password: $password) {
 			id
 			email
 			name
@@ -16,13 +16,12 @@ const SIGNUP_MUTATION = gql`
 	}
 `;
 
-const Signup = () => {
+const Signin = () => {
 	const [email, setEmail] = useState('');
-	const [name, setName] = useState('');
 	const [password, setPassword] = useState('');
 
-	const [signup, { error, loading }] = useMutation(SIGNUP_MUTATION, {
-		variables: { email, name, password },
+	const [signin, { error, loading }] = useMutation(SIGNIN_MUTATION, {
+		variables: { email, password },
 		refetchQueries: [{ query: CURRENT_USER_QUERY }],
 	});
 
@@ -31,14 +30,13 @@ const Signup = () => {
 			method="post"
 			onSubmit={async e => {
 				e.preventDefault();
-				await signup();
+				await signin();
 				setEmail('');
-				setName('');
 				setPassword('');
 			}}
 		>
 			<fieldset disabled={loading} aria-busy={loading}>
-				<h2>Sign up for an account</h2>
+				<h2>Sign into your account</h2>
 				<Error error={error} />
 				<label htmlFor="email">
 					Email
@@ -50,15 +48,6 @@ const Signup = () => {
 						onChange={e => setEmail(e.target.value)}
 					/>
 				</label>
-				<label htmlFor="name"></label>
-				Name
-				<input
-					type="text"
-					name="name"
-					placeholder="Name"
-					value={name}
-					onChange={e => setName(e.target.value)}
-				/>
 				<label htmlFor="password">
 					Password
 					<input
@@ -69,10 +58,10 @@ const Signup = () => {
 						onChange={e => setPassword(e.target.value)}
 					/>
 				</label>
-				<button type="submit">Sign Up</button>
+				<button type="submit">Sign In</button>
 			</fieldset>
 		</Form>
 	);
 };
 
-export default Signup;
+export default Signin;
