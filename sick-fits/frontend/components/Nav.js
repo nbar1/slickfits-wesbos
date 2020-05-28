@@ -6,8 +6,6 @@ import Signout from './Signout';
 const Nav = () => {
 	const me = useUser();
 
-	console.log(me);
-
 	return (
 		<NavStyles>
 			<Link href="/items">
@@ -28,7 +26,6 @@ const Nav = () => {
 					<Signout />
 				</>
 			)}
-
 			{!me && (
 				<>
 					<Link href="/signup">
